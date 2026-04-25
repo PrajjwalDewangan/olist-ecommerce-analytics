@@ -12,5 +12,5 @@ sources:
       - name: RAW_ORDER_PAYMENTS                  #done
       - name: RAW_ORDER_REVIEWS                   #done
       - name: RAW_PRODUCTS                        #done
-      - name: RAW_PRODUCT_CATEGORY_TRANSLATION    
+      - name: RAW_PRODUCT_CATEGORY_TRANSLATION    #done
       - name: RAW_SELLERS                         #done

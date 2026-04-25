@@ -1,0 +1,11 @@
+version: 2
+
+models:
+  - name: stg_geolocations
+    columns:
+      - name: zip_code
+        tests:
+          - not_null
+    tests: 
+      - unique:
+          column_name: zip_code

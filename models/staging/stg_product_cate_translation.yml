@@ -1,0 +1,13 @@
+version: 2
+
+models:
+  - name: stg_product_cate_translation
+    columns:
+      - name: category_name
+        tests:
+          - not_null
+          - unique
+      - name: category_name_english
+        tests:
+          - not_null
+          - unique

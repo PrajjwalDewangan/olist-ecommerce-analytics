@@ -20,7 +20,7 @@ translation as (
 
 select
     p.product_id,
-    coalesce(t.category_name_english, p.category_name) as product_category,
+    coalesce(t.category_name_english, p.category_name, 'unknown') as product_category,
     p.photo_qty,
     p.product_height,
     p.product_weight,

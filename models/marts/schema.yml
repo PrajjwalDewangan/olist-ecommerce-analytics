@@ -1,0 +1,72 @@
+version: 2
+
+models:
+  - name: fct_orders
+    columns:
+      - name: order_id
+        tests: 
+          - not_null
+          - unique
+
+      - name: customer_id
+        tests: 
+          - not_null
+      
+      - name: total_order_value
+        tests: 
+          - not_null
+      
+      - name: total_payment
+        tests: 
+          - not_null
+
+  - name: mart_category_performance
+    columns:
+      - name: product_category
+        tests:
+          - not_null
+          - unique
+
+      - name: total_revenue
+        tests:
+          - not_null
+  
+  - name: mart_customer_analytics
+    columns:
+      - name: customer_id
+        tests:
+          - not_null
+          - unique
+
+      - name: total_orders
+        tests:
+          - not_null
+
+      - name: total_spends
+        tests:
+          - not_null
+
+  - name: mart_product_performance
+    columns:
+      - name: product_id
+        tests:
+          - not_null
+
+      - name: product_category
+        tests:
+          - not_null
+
+      - name: total_revenue
+        tests:
+          - not_null
+
+  - name: mart_order_funnel
+    columns:
+      - name: stage
+        tests:
+          - not_null
+          - unique
+
+      - name: total_orders
+        tests:
+          - not_null

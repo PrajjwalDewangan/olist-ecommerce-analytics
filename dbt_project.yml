@@ -31,7 +31,18 @@ clean-targets:         # directories to be removed by `dbt clean`
 # files using the `{{ config(...) }}` macro.
 models:
   olist_project:
+
     staging:
       +materialized: view
+      +docs:
+        node_color: "#1f77b4"   # blue
+
     intermediate:
       +materialized: view
+      +docs:
+        node_color: "#ff7f0e"   # orange
+
+    marts:
+      +materialized: table
+      +docs:
+        node_color: "#2ca02c"   # green

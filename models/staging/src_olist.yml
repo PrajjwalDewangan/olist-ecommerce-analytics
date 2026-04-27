@@ -4,6 +4,12 @@ sources:
   - name: olist_raw
     database: OLIST_DB
     schema: RAW_DATA
+
+    config:
+      meta:
+        docs:
+          node_color: "#9467bd"
+
     tables:
       - name: RAW_CUSTOMERS                       #done
       - name: RAW_GEOLOCATIONS                    #done

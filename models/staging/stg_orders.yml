@@ -19,5 +19,6 @@ models:
       - name: order_status
         tests:
           - accepted_values:
-              values: ['approved', 'canceled', 'created', 'delivered', 'invoiced', 'processing', 'shipped', 'unavailable']
+              arguments:
+                values: ['approved', 'canceled', 'created', 'delivered', 'invoiced', 'processing', 'shipped', 'unavailable']
           - not_null

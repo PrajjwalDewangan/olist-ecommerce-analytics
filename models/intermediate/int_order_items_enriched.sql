@@ -2,6 +2,7 @@ with order_items as (
     select
         order_id,
         product_id,
+        seller_id,
         price,
         freight_value,
 
@@ -19,6 +20,7 @@ products_enriched as (
 select 
     oi.order_id,
     oi.product_id,
+    oi.seller_id,
     oi.price,
     oi.freight_value,
     p.product_category

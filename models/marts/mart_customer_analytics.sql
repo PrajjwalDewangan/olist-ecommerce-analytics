@@ -11,6 +11,15 @@ with orders as (
     where order_status = 'delivered'
 ),
 
+customers as (
+    select 
+        customer_id,
+        customer_city,
+        customer_state
+    
+    from {{ref('int_customers_enriched')}}
+),
+
 reviews as (
     select 
         order_id,
@@ -21,6 +30,9 @@ reviews as (
 
 select
     o.customer_id,
+    c.customer_city,
+    c.customer_state,
+    
     count(distinct(o.order_id)) as total_orders,
 
     sum(o.total_order_value) as total_spends,
@@ -37,7 +49,12 @@ select
     end as customer_segment
 
 from orders o
+left join customers c
+    on o.customer_id = c.customer_id
 left join reviews r 
     on o.order_id = r.order_id
 
-group by o.customer_id
+group by
+    o.customer_id,
+    c.customer_city,
+    c.customer_state

@@ -3,6 +3,8 @@ with orders as (
         order_id,
         customer_id,
         approved_at,
+        purchased_at,
+        delivered_customer_at,
         order_status
 
     from {{ref('stg_orders')}}
@@ -31,7 +33,9 @@ order_items_agg as (
 select 
     o.order_id, 
     o.customer_id, 
-    o.approved_at, 
+    o.approved_at,
+    o.purchased_at,
+    o.delivered_customer_at, 
     o.order_status,
     coalesce(oi.total_items, 0) as total_items, 
     coalesce(oi.total_product_value, 0) as total_product_value,

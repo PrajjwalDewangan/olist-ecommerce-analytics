@@ -4,6 +4,8 @@ with orders as (
         customer_id,
         order_status,
         approved_at,
+        purchased_at,
+        delivered_customer_at,
         total_items,
         total_product_value,
         total_freight_value,
@@ -24,6 +26,16 @@ select
     o.customer_id,
     o.order_status,
     o.approved_at,
+    o.purchased_at,
+    o.delivered_customer_at,
+    
+    case
+        when o.delivered_customer_at is not null
+        then  datediff(day, o.purchased_at, o.delivered_customer_at)
+    end as delivery_time_days,
+    
+    datediff(day, o.purchased_at, o.approved_at) as approval_delay_days,
+
     o.total_items,
     o.total_product_value,
     o.total_freight_value,

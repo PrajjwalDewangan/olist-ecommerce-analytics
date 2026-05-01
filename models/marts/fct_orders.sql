@@ -36,6 +36,10 @@ select
     
     datediff(day, o.purchased_at, o.approved_at) as approval_delay_days,
 
+    case 
+        when o.delivered_customer_at is not null then 1 else 0 
+    end as is_delivered,
+
     o.total_items,
     o.total_product_value,
     o.total_freight_value,

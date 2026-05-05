@@ -1,7 +1,6 @@
 # Olist E-Commerce Analytics | 2016 - 2018
 End-to-end analytics engineering project built using Snowflake, dbt, and Tableau to analyze e-commerce performance, delivery efficiency, and customer behavior.
 
----
 
 ## Project Overview
 
@@ -13,7 +12,40 @@ This project transforms raw e-commerce data into a clean analytical model and de
 - Understand **customer and seller behavior**
 - Identify **geographic revenue distribution across Brazil**
 
----
+
+## 📦 Dataset
+
+This project uses the **Olist E-Commerce Dataset**, which contains real-world transactional data from a Brazilian e-commerce platform.
+
+### 📊 Dataset Overview:
+- Time Period: 2016–2018  
+- ~100K orders  
+- ~96K customers    
+
+### 📁 Key Tables:
+
+- `orders` – order-level information and timestamps  
+- `order_items` – product-level details per order  
+- `order_payments` – payment transactions  
+- `order_reviews` – customer feedback and ratings  
+- `products` – product metadata  
+- `sellers` – seller information  
+- `customers` – customer details  
+- `geolocation` – location data for mapping  
+
+
+### 🔗 Source
+
+The dataset is publicly available on Kaggle:
+
+👉 [https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce)
+
+
+### ⚠️ Notes
+
+- Data required cleaning and standardization (handled in dbt staging layer)
+- Some timestamps contain missing values (handled in transformations)
+- Geolocation data was used to build Brazil-level maps in Tableau
 
 ## Architecture
 
@@ -23,7 +55,6 @@ Raw Data → Snowflake → dbt Models → Tableau Dashboard
 - **dbt**: Data transformation and modeling  
 - **Tableau**: Data visualization 
 
----
 
 ## Data Modelling (dbt)
 
@@ -33,13 +64,15 @@ The project follows a layered modeling approach:
 - Cleans and standardizes raw data
 
 ### 🔹 Intermediate Layer (`int_*`)
-- Joins and enriches datasets  
-- Examples:
-  - `int_orders_enriched`
-  - `int_products_enriched`
-  - `int_payments_agg`
+Joins and enriches datasets  
+- `int_customers_enriched`
+- `int_order_items_enriched`
+- `int_orders_enriched`
+- `int_payments_agg`
+- `int_products_enriched`
+- `int_reviews_enriched`
+- `int_seller_enriched`
 
----
 
 ### 🔹 Fact Table
 
@@ -60,7 +93,6 @@ The project follows a layered modeling approach:
 - `payment_diff`
 - `is_payment_mismatch`
 
----
 
 ### 🔹 Mart Layer (`mart_*`)
 Business-ready aggregated tables:
@@ -71,7 +103,6 @@ Business-ready aggregated tables:
 - `mart_category_performance`
 - `mart_order_funnel`
 
----
 
 ## 📊 Dashboard Overview
 
@@ -82,7 +113,6 @@ Business-ready aggregated tables:
 - **Total Customers:** 96.48K  
 - **Average Review Score:** 4.16  
 
----
 
 ### 🔹 Key Visualizations
 
@@ -97,7 +127,8 @@ Business-ready aggregated tables:
 
 ![Dashboard](assets/olist-dashboard.png)
 
----
+[View Dashboard on Tableau Public](https://public.tableau.com/app/profile/prajjwal.dewangan/viz/OlistE-CommerceAnalytics_17776420545290/Dashboard2)
+
 
 ## 🔍 Key Insights
 
@@ -107,7 +138,6 @@ Business-ready aggregated tables:
 - Late deliveries are a **key driver of lower review scores**.
 - Ibatinga represents a **high-volume, low-price seller cluster**, while premium sellers operate at significantly higher price points.
 
----
 
 ## 📈 Key Metrics
 
@@ -118,7 +148,6 @@ Business-ready aggregated tables:
 - Late Delivery %  
 - Payment Mismatch Rate  
 
----
 
 ## 🗺️ dbt DAG
 
@@ -128,7 +157,6 @@ Business-ready aggregated tables:
 - Central fact table: `fct_orders`  
 - Downstream marts power Tableau dashboards  
 
----
 
 ## ⚙️ Tech Stack
 
@@ -136,5 +164,3 @@ Business-ready aggregated tables:
 - **dbt** – Data Transformation  
 - **Tableau** – Visualization  
 - **SQL** – Data Modeling  
-
----

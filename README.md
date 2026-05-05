@@ -95,7 +95,7 @@ Business-ready aggregated tables:
 - 🚚 Delivery Time Distribution
 - 🏪 Top Seller Clusters
 
-![Dashboard](assets/OlistDashboard.png)
+![Dashboard](assets/olist-dashboard.png)
 
 ---
 

@@ -20,6 +20,13 @@ models:
         tests: 
           - not_null
 
+  - name: mart_order_experience
+    columns:
+      - name: order_id
+        tests:
+          - unique
+          - not_null
+
   - name: mart_category_performance
     columns:
       - name: product_category

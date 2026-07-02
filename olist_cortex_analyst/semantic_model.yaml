@@ -1,0 +1,547 @@
+name: OLIST_MODEL
+tables:
+  - name: MART_CATEGORY_PERFORMANCE
+    description: The table contains records of aggregated sales performance metrics organized by product category. Each record captures a category's financial performance, including revenue figures, order volumes, pricing averages, and customer review scores, along with a relative ranking by revenue.
+    base_table:
+      database: OLIST_DB
+      schema: DBT_TRANSFORM
+      table: MART_CATEGORY_PERFORMANCE
+    dimensions:
+      - name: PRODUCT_CATEGORY
+        description: The product category associated with a given performance record.
+        expr: PRODUCT_CATEGORY
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - bed_bath_table
+          - watches_gifts
+          - fixed_telephony
+      - name: REVENUE_RANK
+        description: The rank of a category based on its revenue performance relative to other categories.
+        expr: REVENUE_RANK
+        data_type: NUMBER(18,0)
+        sample_values:
+          - '29'
+          - '3'
+          - '49'
+      - name: TOTAL_ITEMS
+        description: The total number of items associated with each category.
+        expr: TOTAL_ITEMS
+        data_type: NUMBER(18,0)
+        sample_values:
+          - '9481'
+          - '33'
+          - '5865'
+      - name: TOTAL_ORDERS
+        description: The total number of orders placed within a given category.
+        expr: TOTAL_ORDERS
+        data_type: NUMBER(18,0)
+        sample_values:
+          - '5495'
+          - '177'
+          - '227'
+    facts:
+      - name: AVG_ITEM_PRICE
+        description: The average price of items within a product category.
+        expr: AVG_ITEM_PRICE
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '198.87941006'
+          - '93.463460145'
+          - '130.175627044'
+      - name: AVG_REVIEW_SCORE
+        description: The average review score given by customers for products within a category.
+        expr: AVG_REVIEW_SCORE
+        data_type: NUMBER(38,6)
+        access_modifier: public_access
+        sample_values:
+          - '4.190172'
+          - '4.140204'
+          - '4.072411'
+      - name: TOTAL_FREIGHT_VALUE
+        description: The total freight value associated with a product category.
+        expr: TOTAL_FREIGHT_VALUE
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '98262.77'
+          - '10269.22'
+          - '4327.42'
+      - name: TOTAL_PRODUCT_REVENUE
+        description: The total revenue generated from products within a given category.
+        expr: TOTAL_PRODUCT_REVENUE
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '1234195.12'
+          - '1031836.6'
+          - '23001.46'
+      - name: TOTAL_REVENUE
+        description: The total revenue generated, measured in monetary units.
+        expr: TOTAL_REVENUE
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '1235065.4'
+          - '250781.34'
+          - '1430.1'
+    primary_key:
+      columns:
+        - PRODUCT_CATEGORY
+  - name: MART_CUSTOMER_ANALYTICS
+    description: The table contains records of customer analytics, aggregating order and spending behavior at the individual customer level. Each record includes details about the customer's geographic location, purchasing metrics such as total orders and average order value, review scores, and a customer segment classification.
+    base_table:
+      database: OLIST_DB
+      schema: DBT_TRANSFORM
+      table: MART_CUSTOMER_ANALYTICS
+    dimensions:
+      - name: CUSTOMER_CITY
+        description: The city where the customer is located.
+        expr: CUSTOMER_CITY
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - sao jose do rio pardo
+          - nilopolis
+          - monte mor
+      - name: CUSTOMER_ID
+        description: Unique identifier assigned to each customer.
+        expr: CUSTOMER_ID
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - 4d25a77a0e3a69074326a44fa3712fe3
+          - 0072357d0a3394d268c6abb9e30aaafe
+          - e03867c72ac77eb2a2981e28ea0d0b2a
+      - name: CUSTOMER_SEGMENT
+        description: The segment classification assigned to a customer based on their value or behavior.
+        expr: CUSTOMER_SEGMENT
+        data_type: VARCHAR(10)
+        sample_values:
+          - low_value
+          - mid_value
+          - high_value
+      - name: CUSTOMER_STATE
+        description: The state where the customer is located.
+        expr: CUSTOMER_STATE
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - CE
+          - MG
+          - SP
+      - name: TOTAL_ORDERS
+        description: The total number of orders placed by a customer.
+        expr: TOTAL_ORDERS
+        data_type: NUMBER(18,0)
+        sample_values:
+          - '1'
+    facts:
+      - name: AVG_ORDER_VALUE
+        description: The average monetary value of orders placed by a customer.
+        expr: AVG_ORDER_VALUE
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '368.82'
+          - '399.38'
+          - '379'
+      - name: AVG_REVIEW_SCORE
+        description: The average review score given by a customer across all their orders.
+        expr: AVG_REVIEW_SCORE
+        data_type: NUMBER(38,6)
+        access_modifier: public_access
+        sample_values:
+          - '2.500000'
+          - '4.000000'
+          - '3.000000'
+      - name: TOTAL_SPENDS
+        description: The total amount spent by a customer across all their orders.
+        expr: TOTAL_SPENDS
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '51.84'
+          - '174.32'
+          - '193.29'
+  - name: MART_ORDER_FUNNEL
+    description: The table contains records tracking order progression through a sales funnel. Each record represents a stage in the funnel process, including metrics on order volumes and conversion rates relative to the start of the funnel.
+    base_table:
+      database: OLIST_DB
+      schema: DBT_TRANSFORM
+      table: MART_ORDER_FUNNEL
+    dimensions:
+      - name: STAGE
+        description: The stage of an order within the order fulfillment funnel.
+        expr: STAGE
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - created
+          - shipped
+          - approved
+      - name: TOTAL_ORDERS
+        description: The total number of orders.
+        expr: TOTAL_ORDERS
+        data_type: NUMBER(18,0)
+        sample_values:
+          - '97585'
+          - '99441'
+          - '97888'
+    facts:
+      - name: CONVERSION_FROM_START
+        description: The cumulative conversion rate at each stage of the order funnel relative to the starting point.
+        expr: CONVERSION_FROM_START
+        data_type: NUMBER(25,6)
+        access_modifier: public_access
+        sample_values:
+          - '0.984383'
+          - '0.981336'
+          - '1.000000'
+  - name: MART_PRODUCT_PERFORMANCE
+    description: The table contains records of product performance metrics aggregated at the product level. Each record covers a single product and includes details about its category, sales volumes, revenue figures, freight costs, and average customer review scores.
+    base_table:
+      database: OLIST_DB
+      schema: DBT_TRANSFORM
+      table: MART_PRODUCT_PERFORMANCE
+    dimensions:
+      - name: PRODUCT_CATEGORY
+        description: The category to which a product belongs.
+        expr: PRODUCT_CATEGORY
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - housewares
+          - sports_leisure
+          - signaling_and_security
+      - name: PRODUCT_ID
+        description: Unique identifier assigned to each product.
+        expr: PRODUCT_ID
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - a9a7d44cbdf7c47c958a585d66a0c3e1
+          - 8f8496902e65ff58118aab478dc2a55e
+          - f9471562478eba8761bc985b968a0092
+      - name: TOTAL_ORDERS
+        description: The total number of orders placed for a given product.
+        expr: TOTAL_ORDERS
+        data_type: NUMBER(18,0)
+        sample_values:
+          - '110'
+          - '10'
+          - '6'
+      - name: TOTAL_PRODUCTS_SOLD
+        description: The total number of products sold.
+        expr: TOTAL_PRODUCTS_SOLD
+        data_type: NUMBER(18,0)
+        sample_values:
+          - '43'
+          - '83'
+          - '8'
+    facts:
+      - name: AVG_PRICE
+        description: The average price of a product across all associated orders.
+        expr: AVG_PRICE
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '69'
+          - '99.99'
+          - '149.333333333'
+      - name: AVG_REVIEW_SCORE
+        description: The average review score given by customers for a product.
+        expr: AVG_REVIEW_SCORE
+        data_type: NUMBER(38,6)
+        access_modifier: public_access
+        sample_values:
+          - '4.000000'
+          - '3.727273'
+          - '3.982906'
+      - name: TOTAL_FREIGHT_VALUE
+        description: The total freight value associated with a product.
+        expr: TOTAL_FREIGHT_VALUE
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '128.3'
+          - '123.46'
+          - '436.14'
+      - name: TOTAL_PRODUCT_REVENUE
+        description: The total revenue generated by a product across all sales.
+        expr: TOTAL_PRODUCT_REVENUE
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '763.6'
+          - '1173'
+          - '1999.9'
+      - name: TOTAL_REVENUE
+        description: The total revenue generated from product sales.
+        expr: TOTAL_REVENUE
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '1545.39'
+          - '411.33'
+          - '1352.59'
+  - name: MART_SELLER_PERFORMANCE
+    description: The table contains records of seller performance metrics aggregated at the seller level. Each record represents a single seller and includes details about their geographic location as well as sales performance figures such as order volumes, revenue, and pricing.
+    base_table:
+      database: OLIST_DB
+      schema: DBT_TRANSFORM
+      table: MART_SELLER_PERFORMANCE
+    dimensions:
+      - name: CITY
+        description: The city where the seller is located.
+        expr: CITY
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - pelotas
+          - borda da mata
+          - ibia
+      - name: SELLER_ID
+        description: Unique identifier assigned to each seller.
+        expr: SELLER_ID
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - 6c77cd583b36a13aacccf2b3ee23e233
+          - 282c7480173bb9c01dd41cc739fec010
+          - 717b78b0950b51ed00b1471d858b0edc
+      - name: STATE
+        description: The Brazilian state where the seller is located.
+        expr: STATE
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - ES
+          - PR
+          - RN
+      - name: TOTAL_ITEMS_SOLD
+        description: The total number of items sold by a seller.
+        expr: TOTAL_ITEMS_SOLD
+        data_type: NUMBER(18,0)
+        sample_values:
+          - '89'
+          - '39'
+          - '90'
+      - name: TOTAL_ORDERS
+        description: The total number of orders associated with a seller.
+        expr: TOTAL_ORDERS
+        data_type: NUMBER(18,0)
+        sample_values:
+          - '13'
+          - '35'
+          - '49'
+    facts:
+      - name: AVG_ITEM_PRICE
+        description: The average price of items sold by a seller.
+        expr: AVG_ITEM_PRICE
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '168.341558442'
+          - '40.29'
+          - '48'
+      - name: GROSS_ORDER_VALUE
+        description: The total gross value of orders associated with a seller before any deductions or adjustments.
+        expr: GROSS_ORDER_VALUE
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '88.56'
+          - '234.61'
+          - '630.44'
+      - name: SELLER_REVENUE
+        description: The total revenue generated by a seller across their transactions.
+        expr: SELLER_REVENUE
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '899.9'
+          - '1059.36'
+          - '54440.28'
+      - name: TOTAL_SHIPPING_COST
+        description: The total shipping cost incurred by the seller across all orders.
+        expr: TOTAL_SHIPPING_COST
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '165.87'
+          - '12.26'
+          - '3189.3'
+  - name: MART_ORDER_EXPERIENCE
+    description: The table contains order-level records combining delivery performance and customer satisfaction data. Each record represents a single delivered order, capturing the order date, delivery time, payment value, and the customer's review score for that order.
+    base_table:
+      database: OLIST_DB
+      schema: DBT_TRANSFORM
+      table: MART_ORDER_EXPERIENCE
+    dimensions:
+      - name: ORDER_ID
+        description: Unique identifier assigned to each order.
+        expr: ORDER_ID
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - e481f51cbdc54678b7cc49136f2d6af7
+          - 9ef432eb6251297304e76186b10a928d
+          - b81ef226f3fe1789b1e8b2acac839d17
+    time_dimensions:
+      - name: ORDER_MONTH
+        description: The calendar month in which the order was purchased, used for trend and time-series analysis.
+        expr: ORDER_MONTH
+        data_type: DATE
+        sample_values:
+          - '2017-01-01'
+          - '2017-06-01'
+          - '2018-03-01'
+    facts:
+      - name: DELIVERY_TIME_DAYS
+        description: The number of days between order purchase and delivery to the customer.
+        expr: DELIVERY_TIME_DAYS
+        data_type: NUMBER(18,0)
+        access_modifier: public_access
+        sample_values:
+          - '7'
+          - '19'
+          - '35'
+      - name: TOTAL_PAYMENT
+        description: The total payment value for the order.
+        expr: TOTAL_PAYMENT
+        data_type: FLOAT
+        access_modifier: public_access
+        sample_values:
+          - '159.33'
+          - '89.90'
+          - '412.50'
+      - name: REVIEW_SCORE
+        description: The customer's review score for the order, on a scale of 1 to 5.
+        expr: REVIEW_SCORE
+        data_type: NUMBER(2,0)
+        access_modifier: public_access
+        sample_values:
+          - '5'
+          - '4'
+          - '1'
+    primary_key:
+      columns:
+        - ORDER_ID
+verified_queries:
+  - name: '"0;1"'
+    sql: SELECT STAGE, CONVERSION_FROM_START FROM mart_order_funnel WHERE UPPER(STAGE) LIKE '%dDELIVERED%';
+    question: What is the conversion rate for orders that reach the delivered stage?
+    verified_at: 1782834216
+    verified_by: Semantic Model Generator
+    use_as_onboarding_question: false
+  - name: '"1;1"'
+    sql: SELECT STAGE, TOTAL_ORDERS FROM mart_order_funnel;
+    question: How many orders are in each funnel stage?
+    verified_at: 1782834216
+    verified_by: Semantic Model Generator
+    use_as_onboarding_question: false
+  - name: '"2;1"'
+    sql: SELECT STAGE, CONVERSION_FROM_START FROM mart_order_funnel;
+    question: What are the conversion rates at each funnel stage?
+    verified_at: 1782834216
+    verified_by: Semantic Model Generator
+    use_as_onboarding_question: false
+  - name: '"3;1"'
+    sql: SELECT STAGE, TOTAL_ORDERS, CONVERSION_FROM_START FROM mart_order_funnel ORDER BY TOTAL_ORDERS DESC;
+    question: What does the order funnel look like with stages ranked by volume?
+    verified_at: 1782834216
+    verified_by: Semantic Model Generator
+    use_as_onboarding_question: false
+  - name: '"4;1"'
+    sql: SELECT SELLER_ID, TOTAL_SHIPPING_COST FROM mart_seller_performance ORDER BY TOTAL_SHIPPING_COST DESC LIMIT 20;
+    question: Which sellers have the highest shipping costs?
+    verified_at: 1782834216
+    verified_by: Semantic Model Generator
+    use_as_onboarding_question: false
+  - name: '"5;1"'
+    sql: SELECT STATE, AVG(AVG_ITEM_PRICE) AS AVG_ITEM_PRICE FROM mart_seller_performance GROUP BY STATE ORDER BY AVG_ITEM_PRICE DESC;
+    question: What is the average item price by seller state?
+    verified_at: 1782834216
+    verified_by: Semantic Model Generator
+    use_as_onboarding_question: false
+  - name: '"6;1"'
+    sql: SELECT SELLER_ID, TOTAL_ORDERS FROM mart_seller_performance ORDER BY TOTAL_ORDERS DESC LIMIT 20;
+    question: Which sellers have the highest number of orders?
+    verified_at: 1782834216
+    verified_by: Semantic Model Generator
+    use_as_onboarding_question: false
+  - name: '"7;1"'
+    sql: SELECT STATE, SUM(SELLER_REVENUE) AS TOTAL_REVENUE FROM mart_seller_performance GROUP BY STATE ORDER BY TOTAL_REVENUE DESC;
+    question: Which states generate the most revenue from sellers?
+    verified_at: 1782834216
+    verified_by: Semantic Model Generator
+    use_as_onboarding_question: false
+  - name: '"8;1"'
+    sql: SELECT SELLER_ID, SELLER_REVENUE FROM mart_seller_performance ORDER BY SELLER_REVENUE DESC LIMIT 20;
+    question: Which sellers generate the highest revenue?
+    verified_at: 1782834216
+    verified_by: Semantic Model Generator
+    use_as_onboarding_question: false
+  - name: '"9;1"'
+    sql: SELECT PRODUCT_CATEGORY, SUM(TOTAL_REVENUE) AS TOTAL_REVENUE FROM mart_product_performance GROUP BY PRODUCT_CATEGORY ORDER BY TOTAL_REVENUE DESC;
+    question: Which product categories generate the highest revenue?
+    verified_at: 1782834216
+    verified_by: Semantic Model Generator
+    use_as_onboarding_question: false
+  - name: '"10;1"'
+    sql: SELECT PRODUCT_ID, AVG_REVIEW_SCORE FROM mart_product_performance ORDER BY AVG_REVIEW_SCORE DESC;
+    question: Which products have the highest average review scores?
+    verified_at: 1782834216
+    verified_by: Semantic Model Generator
+    use_as_onboarding_question: false
+  - name: '"11;1"'
+    sql: SELECT PRODUCT_ID, TOTAL_REVENUE FROM mart_product_performance ORDER BY TOTAL_REVENUE DESC LIMIT 20;
+    question: Which products generate the highest revenue?
+    verified_at: 1782834216
+    verified_by: Semantic Model Generator
+    use_as_onboarding_question: false
+  - name: '"12;1"'
+    sql: SELECT PRODUCT_ID, TOTAL_PRODUCTS_SOLD FROM mart_product_performance ORDER BY TOTAL_PRODUCTS_SOLD DESC LIMIT 20;
+    question: Which products sold the most units?
+    verified_at: 1782834216
+    verified_by: Semantic Model Generator
+    use_as_onboarding_question: false
+  - name: '"13;1"'
+    sql: SELECT CUSTOMER_STATE, AVG(AVG_ORDER_VALUE) AS AVG_ORDER_VALUE FROM mart_customer_analytics GROUP BY CUSTOMER_STATE ORDER BY AVG_ORDER_VALUE DESC;
+    question: What is the average order value by customer state?
+    verified_at: 1782834216
+    verified_by: Semantic Model Generator
+    use_as_onboarding_question: false
+  - name: '"14;1"'
+    sql: SELECT CUSTOMER_SEGMENT, COUNT(*) AS CUSTOMER_COUNT FROM mart_customer_analytics GROUP BY CUSTOMER_SEGMENT ORDER BY CUSTOMER_COUNT DESC;
+    question: How many customers are in each customer segment?
+    verified_at: 1782834216
+    verified_by: Semantic Model Generator
+    use_as_onboarding_question: false
+  - name: '"15;1"'
+    sql: SELECT CUSTOMER_STATE, SUM(TOTAL_SPENDS) AS TOTAL_SPENDING FROM mart_customer_analytics GROUP BY CUSTOMER_STATE ORDER BY TOTAL_SPENDING DESC;
+    question: Which states generate the highest customer spending?
+    verified_at: 1782834216
+    verified_by: Semantic Model Generator
+    use_as_onboarding_question: false
+  - name: '"16;1"'
+    sql: SELECT CUSTOMER_ID, TOTAL_SPENDS FROM mart_customer_analytics ORDER BY TOTAL_SPENDS DESC LIMIT 20;
+    question: Who are the top 20 customers by total spending?
+    verified_at: 1782834216
+    verified_by: Semantic Model Generator
+    use_as_onboarding_question: false
+  - name: '"17;1"'
+    sql: SELECT PRODUCT_CATEGORY, AVG_ITEM_PRICE FROM mart_category_performance ORDER BY AVG_ITEM_PRICE DESC;
+    question: Which product categories have the highest average item prices?
+    verified_at: 1782834216
+    verified_by: Semantic Model Generator
+    use_as_onboarding_question: false
+  - name: '"18;1"'
+    sql: SELECT PRODUCT_CATEGORY, TOTAL_ORDERS FROM mart_category_performance ORDER BY TOTAL_ORDERS DESC;
+    question: Which product categories have the highest number of orders?
+    verified_at: 1782834216
+    verified_by: Semantic Model Generator
+    use_as_onboarding_question: false
+  - name: '"19;1"'
+    sql: SELECT PRODUCT_CATEGORY, AVG_REVIEW_SCORE FROM mart_category_performance ORDER BY AVG_REVIEW_SCORE DESC;
+    question: Which product categories have the highest average review scores?
+    verified_at: 1782834216
+    verified_by: Semantic Model Generator
+    use_as_onboarding_question: false
+  - name: '"20;1"'
+    sql: SELECT PRODUCT_CATEGORY, TOTAL_REVENUE FROM mart_category_performance ORDER BY TOTAL_REVENUE DESC LIMIT 10;
+    question: What are the top 10 product categories by revenue?
+    verified_at: 1782834216
+    verified_by: Semantic Model Generator
+    use_as_onboarding_question: false

@@ -68,7 +68,6 @@ def cached_query(sql):
     return run_query(sql)
 
 
-# Consistent blue palette + chart styling for the dashboard tab
 PALETTE = ["#0B3D91", "#1B5FAE", "#2E7BC4", "#4B9FD4", "#7BC0E4", "#AEDCF0"]
 
 
@@ -87,6 +86,7 @@ def style_chart(fig, show_legend=False):
     return fig
 
 
+# CHAT TAB
 if page == "💬 Chat":
 
     st.sidebar.header("Quick Questions")
@@ -99,11 +99,17 @@ if page == "💬 Chat":
         "Show the order funnel",
     ]
 
+    # Initialize chat history early
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+
+    # Use a dynamic key based on message count so it resets cleanly when cleared
+    pill_key = f"quick_questions_{len(st.session_state.messages)}"
     selected_question = st.sidebar.pills(
         "",
         sample_questions,
         selection_mode="single",
-        key="quick_questions"
+        key=pill_key
     )
 
     st.sidebar.divider()
@@ -113,141 +119,112 @@ if page == "💬 Chat":
         use_container_width=True
     ):
         st.session_state.messages = []
-
-        if "quick_questions" in st.session_state:
-            del st.session_state["quick_questions"]
-
+        if "last_processed_pill" in st.session_state:
+            del st.session_state["last_processed_pill"]
         st.rerun()
 
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
+    # 1. RENDER PAST HISTORY WITH ISOLATED WIDGET KEYS
+    # Enumeration guarantees that historical charts get distinct, valid IDs
+    for idx, message in enumerate(st.session_state.messages):
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+            if "sql" in message and message["sql"]:
+                with st.expander("Generated SQL", expanded=False):
+                    st.code(message["sql"], language="sql")
+            if "df" in message and message["df"] is not None:
+                st.subheader("Results")
+                st.dataframe(message["df"], use_container_width=True)
+                
+                # Re-render auto-charts safely with a unique element key
+                numeric_cols = message["df"].select_dtypes(include="number").columns
+                if len(message["df"].columns) == 2 and len(numeric_cols) == 1 and len(message["df"]) > 0:
+                    fig = px.bar(
+                        message["df"], 
+                        x=message["df"].columns[0], 
+                        y=numeric_cols[0], 
+                        title=message.get("query_text", "")
+                    )
+                    st.plotly_chart(fig, use_container_width=True, key=f"hist_chart_{idx}")
 
-    chat_container = st.container()
+    # 2. SEPARATE CHAT INPUT FROM SIDEBAR PROCESSING
+    typed_question = st.chat_input("Ask a business question...")
 
-    with chat_container:
+    active_question = None
+    
+    # Priority 1: User typed an explicit question
+    if typed_question:
+        active_question = typed_question
+        # Stashing the currently highlighted pill into memory prevents it from auto-firing next rerun
+        st.session_state.last_processed_pill = selected_question
+            
+    # Priority 2: User clicked a sidebar pill that hasn't been evaluated yet
+    elif selected_question:
+        if "last_processed_pill" not in st.session_state or st.session_state.last_processed_pill != selected_question:
+            active_question = selected_question
+            st.session_state.last_processed_pill = selected_question
 
-        for message in st.session_state.messages:
-
-            with st.chat_message(message["role"]):
-                st.markdown(message["content"])
-
-    typed_question = st.chat_input(
-        "Ask a business question..."
-    )
-
-    question = selected_question or typed_question
-
-    if question:
-
-        # Store user message
-        st.session_state.messages.append(
-            {
-                "role": "user",
-                "content": question
-            }
-        )
-
+    # 3. RUN BACKEND PIPELINE
+    if active_question:
+        st.session_state.messages.append({"role": "user", "content": active_question})
         with st.chat_message("user"):
-            st.markdown(question)
+            st.markdown(active_question)
 
         with st.chat_message("assistant"):
-
             with st.spinner("Thinking..."):
+                response = ask_analyst(active_question)
 
-                response = ask_analyst(question)
-
-            # API Error Handling
             if response.status_code != 200:
-
-                st.error(
-                    f"API Error: {response.status_code}"
-                )
-
+                st.error(f"API Error: {response.status_code}")
                 try:
                     st.json(response.json())
                 except ValueError:
                     st.code(response.text or "No response body")
-
             else:
-
                 response_json = response.json()
-
                 answer = extract_text(response_json)
-
                 sql = extract_sql(response_json)
 
-                # Store assistant answer
-                st.session_state.messages.append(
-                    {
-                        "role": "assistant",
-                        "content": answer
-                    }
-                )
-
-                # Display answer
                 st.markdown(answer)
 
-                # Display generated SQL
+                df_results = None
                 if sql:
-
                     with st.expander("Generated SQL"):
                         st.code(sql, language="sql")
 
                     try:
-                        # Chat queries remain dynamic (live run_query)
-                        df = run_query(sql)
-
+                        df_results = run_query(sql)
                         st.subheader("Results")
+                        st.dataframe(df_results, use_container_width=True)
 
-                        st.dataframe(
-                            df,
-                            use_container_width=True
-                        )
-
-                        # -------------------------
-                        # Automatic Chart
-                        # -------------------------
-
-                        numeric_cols = df.select_dtypes(
-                            include="number"
-                        ).columns
-
-                        if (
-                            len(df.columns) == 2
-                            and len(numeric_cols) == 1
-                            and len(df) > 0
-                        ):
-
-                            fig = px.bar(
-                                df,
-                                x=df.columns[0],
-                                y=numeric_cols[0],
-                                title=question
-                            )
-
-                            st.plotly_chart(
-                                fig,
-                                use_container_width=True
-                            )
+                        # Auto chart fresh execution turn
+                        numeric_cols = df_results.select_dtypes(include="number").columns
+                        if len(df_results.columns) == 2 and len(numeric_cols) == 1 and len(df_results) > 0:
+                            fig = px.bar(df_results, x=df_results.columns[0], y=numeric_cols[0], title=active_question)
+                            st.plotly_chart(fig, use_container_width=True, key=f"fresh_chart_{len(st.session_state.messages)}")
 
                     except Exception as e:
+                        st.error(f"SQL Execution Error:\n{e}")
 
-                        st.error(
-                            f"SQL Execution Error:\n{e}"
-                        )
+                # Save metadata bundle back to history
+                st.session_state.messages.append({
+                    "role": "assistant",
+                    "content": answer,
+                    "sql": sql,
+                    "df": df_results,
+                    "query_text": active_question
+                })
+                
+                st.rerun()
 
 
+# DASHBOARD TAB
 elif page == "📊 Dashboard":
 
     st.caption(
-        "Static overview built directly from the dbt marts "
-        "(no Cortex Analyst call)."
+        "Static overview built directly from the dbt marts (no Cortex Analyst call)."
     )
 
-    # -------------------------
-    # KPI strip (Now Cached!)
-    # -------------------------
-
+    # KPI strip
     try:
         df_orders = cached_query(
             """
@@ -306,9 +283,7 @@ elif page == "📊 Dashboard":
 
     st.write("")
 
-    # -------------------------
-    # Row 0: Top 10 cities by revenue (Now Cached!)
-    # -------------------------
+    # Row 0: Top 10 cities by revenue
 
     with st.container(border=True):
 
@@ -344,9 +319,7 @@ elif page == "📊 Dashboard":
 
     st.write("")
 
-    # -------------------------
-    # Row 0.5: Revenue over time (Now Cached!)
-    # -------------------------
+    # Row 0.5: Revenue over time
 
     with st.container(border=True):
 
@@ -378,10 +351,8 @@ elif page == "📊 Dashboard":
 
     st.write("")
 
-    # -------------------------
-    # Row 1: Revenue by category | Order funnel (Now Cached!)
-    # -------------------------
-
+    # Row 1: Revenue by category | Order funnel
+    
     row1_col1, row1_col2 = st.columns(2)
 
     with row1_col1:
@@ -446,9 +417,7 @@ elif page == "📊 Dashboard":
 
     st.write("")
 
-    # -------------------------
-    # Row 2: Top sellers (Now Cached!)
-    # -------------------------
+    # Row 2: Top sellers
 
     with st.container(border=True):
 
@@ -484,9 +453,7 @@ elif page == "📊 Dashboard":
 
     st.write("")
 
-    # -------------------------
-    # Row 2.5: Review score distribution | Delivery time distribution (Now Cached!)
-    # -------------------------
+    # Row 2.5: Review score distribution | Delivery time distribution
 
     row25_col1, row25_col2 = st.columns(2)
 
@@ -565,9 +532,7 @@ elif page == "📊 Dashboard":
 
     st.write("")
 
-    # -------------------------
-    # Row 3: Revenue by seller state (Now Cached!)
-    # -------------------------
+    # Row 3: Revenue by seller state
 
     with st.container(border=True):
 
